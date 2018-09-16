@@ -48,6 +48,19 @@ Route::group(['prefix'=>'/'],function()
 
     //-----------------FRONTEND------------------------------//
 
+    //-----------------DLL-----------------------------------//
+    Route::get('/regis_confirm/{email}/{token}',
+        [
+            "uses"=>"EmailController@regis_confirm",
+            "as"=>"emailregis"
+        ]);
+
+    Route::get('/event_confirm/{event_id}/{token}',
+        [
+            "uses"=>"EmailController@event_confirm",
+            "as"=>"eventregis"
+        ]);
+
 
     //-----------------BACKEND------------------------------//
     //Routing dasar untuk tampilan awal web admin - Backend
@@ -218,10 +231,10 @@ Route::group(['prefix'=>'/'],function()
     });
 
     //Routing untuk pengiriman EMAIL
-    Route::get('/email', function () {
-        return view('send_email');
-    });
-    Route::post('/sendEmail', 'EmailController@sendEmail');
+    //Route::get('/email', function () {
+        //return view('send_email');
+    //});
+    //Route::post('/sendEmail', 'EmailController@sendEmail');
 
     //-----------------BACKEND------------------------------//
 });

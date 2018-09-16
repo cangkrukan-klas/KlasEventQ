@@ -44,68 +44,71 @@ class ApiProfileController extends Controller
 
         if($user!=null)
         {
-            if(sha1($request->password)== $user->password) {
-                if ($request->file("photo")) {
-                    $time = Carbon::now();
-                    $extension = $request->file('photo')->getClientOriginalExtension();
-                    $directory = 'Account/';
-                    $filename = str_slug($request->input('name')) . '-' . date_format($time, 'd') . rand(1, 999) . date_format($time, 'h') . "." . $extension;
-                    $upload_success = $request->file("photo")->storeAs($directory, $filename, 'public');
+            if($request->email != $user->email)
+            {
+                if (sha1($request->password) == $user->password)
+                {
+                    if ($request->file("photo")) {
+                        $time = Carbon::now();
+                        $extension = $request->file('photo')->getClientOriginalExtension();
+                        $directory = 'Account/';
+                        $filename = str_slug($request->input('name')) . '-' . date_format($time, 'd') . rand(1, 999) . date_format($time, 'h') . "." . $extension;
+                        $upload_success = $request->file("photo")->storeAs($directory, $filename, 'public');
 
-                    $user->update([
-                        'name' => $request->name,
-                        'email' => $request->email,
-                        //'password'=>sha1($request->password),
-                        'address' => $request->address,
-                        'gender' => $request->gender,
-                        //'birthdate'=>$request->birthdate,
-                        'regency_id' => $request->regency_id,
-                        'photo' => $filename,
-                    ]);
+                        $user->update([
+                            'name' => $request->name,
+                            'email' => $request->email,
+                            'password' => sha1($request->password),
+                            'address' => $request->address,
+                            'gender' => $request->gender,
+                            //'birthdate'=>$request->birthdate,
+                            'regency_id' => $request->regency_id,
+                            'photo' => $filename,
+                            'status'=>0,
+                        ]);
 
+                        return response()->json([
+                            "status" => true,
+                            "code" => 200,
+                            "message" => "berhasil diupdate menggunakan foto",
+                            "data" => $user
+                        ]);
+                    } else {
+                        //$filename = '';
+                        $user->update([
+                            'name' => $request->name,
+                            'email' => $request->email,
+                            //'password'=>sha1($request->password),
+                            'address' => $request->address,
+                            'gender' => $request->gender,
+                            //'birthdate'=>$request->birthdate,
+                            'regency_id' => $request->regency_id,
+                            //'photo' => $filename,
+                            'status'=>0,
+                        ]);
+
+                        return response()->json([
+                            "status" => true,
+                            "code" => 300,
+                            "message" => "berhasil diupdate tanpa foto",
+                        ]);
+                    }
+                    //kirim EMAIL disini
+                }
+                else {
                     return response()->json([
-                        "status" => true,
-                        "code" => 200,
-                        "message" => "berhasil diupdate menggunakan foto",
-                        "data" => $user
-                    ]);
-                } else {
-                    //$filename = '';
-                    $user->update([
-                        'name' => $request->name,
-                        'email' => $request->email,
-                        //'password'=>sha1($request->password),
-                        'address' => $request->address,
-                        'gender' => $request->gender,
-                        //'birthdate'=>$request->birthdate,
-                        'regency_id' => $request->regency_id,
-                        //'photo' => $filename,
-                    ]);
-
-                    return response()->json([
-                        "status" => true,
-                        "code" => 300,
-                        "message" => "berhasil diupdate tanpa foto",
-                        "data" => $user
+                        "status" => false,
+                        "code" => 500,
+                        "message" => "password tidak sesuai"
                     ]);
                 }
-
-                /*if($request->email != $user->email)
-                {
-                    Mail::send('email', ['token' => $token, 'name' => $request->name, 'user' => $user], function ($message) use ($request) {
-                        $message->subject('Konfirmasi Pendaftaran Email Baru');
-                        $message->from('cangkrukan.klas@gmail.com', 'Kelompok Linux Arek Suroboyo (KLAS)');
-                        $message->to($request->email);
-                    });
-                }*/
-
             }
             else
             {
                 return response()->json([
                     "status"=>false,
-                    "code"=>500,
-                    "message"=>"password tidak sesuai"
+                    "code"=>400,
+                    "message"=>"email yang dimasukkan sama"
                 ]);
             }
         }
@@ -113,16 +116,41 @@ class ApiProfileController extends Controller
 
     public function updatePassword(Request $request, $id)
     {
+        $oldPassword = sha1($request->oldpassword);
+        $newPassword = sha1($request->newpassword);
+        //$token = str_random(100);
         $user = User::where('id',$id)->first();
-        $user->password = sha1($request->password);
-        $user->save();
+        if($oldPassword == $user->password)
+        {
+            $user->password = $newPassword;
+            //$user->token = $token;
+            //$user->status = 0;
 
-        return response()->json([
-            "status"=>true,
-            "code"=>200,
-            "message"=>"berhasil diupdate password",
-            "data"=>$request->password
-        ]);
+            if ($user->save()) {
+
+                //tambah email
+                return response()->json([
+                    "status" => true,
+                    "code" => 200,
+                    "message" => "berhasil diupdate password",
+                    "data" => $user
+                ]);
+            } else {
+                return response()->json([
+                    "status" => false,
+                    "code" => 500,
+                    "message" => "gagal update password"
+                ]);
+            }
+        }
+        else
+        {
+            return response()->json([
+                "status"=>false,
+                "code"=>300,
+                "message"=>"password lama dan baru tidak cocok"
+            ]);
+        }
     }
 
     public function show() //Read All
@@ -135,23 +163,37 @@ class ApiProfileController extends Controller
         ]);
     }
 
-    public function detailuser($id){
+    public function detailuser($id)
+    {
         $cekuser=User::where(['id'=>$id])->first();
-        if (is_null($cekuser)){
-            $params = [
+        if (is_null($cekuser))
+        {
+            return response()->json([
                 'code' => 500,
                 'status'=>false,
                 'message' => 'data user gagal ditampilkan',
-            ];
-            return response()->json($params);
+            ]);
         }
-        $params=[
-            'code' => 200,
-            'status'=>true,
-            'message' => 'data user berhasil ditampilkan',
-            'data'=>$cekuser
-        ];
-        return response()->json($params);
+        else
+        {
+            if($cekuser->photo != null)
+            {
+                return response()->json([
+                    'code' => 200,
+                    'status' => true,
+                    'message' => 'data user berhasil ditampilkan dengan foto',
+                    'data' => $cekuser
+                ]);
+            }
+            else
+            {
+                return response()->json([
+                   "status"=>false,
+                   "code"=>300,
+                   "message"=>"data user berhasul ditampilkan tanpa foto",
+                    "data"=>$cekuser
+                ]);
+            }
+        }
     }
-
 }

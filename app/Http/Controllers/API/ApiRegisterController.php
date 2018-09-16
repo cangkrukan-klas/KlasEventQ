@@ -10,6 +10,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -26,6 +27,8 @@ class ApiRegisterController extends Controller
             {
                 $token = str_random(100);
 
+                $file = asset('Images\Account\default.png');
+
                 $user =
                     [
                         'name' => $request->name,
@@ -34,6 +37,7 @@ class ApiRegisterController extends Controller
                         'gender'=>$request->gender,
                         'status' => 0,
                         'token' => $token,
+                        'photo' => $file
                     ];
 
                 Validator::make($user, [

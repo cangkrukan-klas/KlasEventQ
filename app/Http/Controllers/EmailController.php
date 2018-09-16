@@ -22,15 +22,15 @@ class EmailController extends Controller
         if($user)
         {
             $user->status = 1;
-            $user->token = null;
+            $user->token = 0;
             $user->save();
             if($user->user_role == 1)
             {
-                redirect('/admin/login');
+                return view('Auth.login');
             }
             else
             {
-                redirect('/login');
+                redirect('Auth.login');
             }
         }
         else
@@ -43,19 +43,11 @@ class EmailController extends Controller
     {
         //$registeredUser = EventParticipant::where('user_id',$user_id)->where('event_id',$event_id)->first();
         $registerUser = EventParticipant::where('event_id', $event_id)->where('token', $token)->first();
-        if ($registerUser) {
+        if ($registerUser)
+        {
             $registerUser->attendance = 1;
             $registerUser->save();
-            if($registerUser->user_role == 1)
-            {
-
-            }
-            else
-            {
-                redirect('/');
-            }
-        } else {
-            redirect('/error');
+            return view('/'); //direturn ke view event dengan tampilan sudah registered
         }
     }
 

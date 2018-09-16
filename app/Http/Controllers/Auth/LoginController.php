@@ -38,14 +38,19 @@ class LoginController extends Controller
         ])->firstOrFail();
 
         if($activeUser->status == 1) {
-            if (is_null($activeUser)) {
+            if (is_null($activeUser))
+            {
                 return "<div class='alert alert-danger'>Pengguna Tidak Ditemukan!</div>";
-            } else {
-                if ($activeUser->password != $password) {
+            }
+            else
+                {
+                if ($activeUser->password != $password)
+                {
                     return "<div class='alert alert-danger'>Password Salah!</div>";
-                } else {
+                } else
+                    {
                     $request->session()->put('activeUser', $activeUser);
-                    return redirect("/admin/profile");
+                    return redirect("/admin/profile")->with('alert','Anda sudah logout');
                 }
             }
         }
