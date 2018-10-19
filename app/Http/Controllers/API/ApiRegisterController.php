@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Mail\RegisterEmail;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -49,22 +50,13 @@ class ApiRegisterController extends Controller
 
                 if (User::create($user))
                 {
-                    try {
-                        Mail::send('email', ['token' => $token, 'name' => $request->name, 'email' => $request->email], function ($message) use ($request) {
-                            $message->subject('Konfirmasi Pendaftaran User Baru');
-                            $message->from('cangkrukanklas18@gmail.com', 'Kelompok Linux Arek Suroboyo (KLAS)');
-                            $message->to($request->email);
-                        });
-                        //return back()->with('alert-success', 'Berhasil Kirim Email');
-                        return response()->json([
-                            "status"=>true,
-                            "code"=>200,
-                            "message"=>"berhasil"
-                        ]);
-                    } catch (Exception $e) {
-                        return response(['status' => false, 'code'=>200, 'errors' => $e->getMessage()]);
-                        //return view('Auth.login');
-                    }
+                    //Mail::to($request->email)->send(new RegisterEmail($request->name, $token, $request->email));
+                    Mail::to($request->email)->send(new RegisterEmail($request->name,$token,$request->email));
+                    return response()->json([
+                        "status"=>true,
+                        "code"=>200,
+                        "message"=>"berhasil"
+                    ]);
                 }
                 else
                 {

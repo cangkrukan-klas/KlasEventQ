@@ -10,6 +10,8 @@ namespace App\Http\Controllers\API;
 
 
 use App\Http\Controllers\Controller;
+use App\Mail\RegisterEmail;
+use App\Mail\UpdateProfileEmail;
 use App\Models\User;
 use Carbon\Carbon;
 use http\Env\Response;
@@ -34,6 +36,7 @@ class ApiProfileController extends Controller
         //$user = User::where('id',$id);
         $user = User::find($id);
         $token = str_random(100);
+        $password = sha1($request->password);
 
         /*$this->validate($request,[
             'name'=> 'required|string|max:255',
@@ -45,10 +48,9 @@ class ApiProfileController extends Controller
         if($user!=null)
         {
             if($request->email != $user->email)
-            {
-                if (sha1($request->password) == $user->password)
                 {
-                    if ($request->file("photo")) {
+                    if($request->file('photo'))
+                    {
                         $time = Carbon::now();
                         $extension = $request->file('photo')->getClientOriginalExtension();
                         $directory = 'Account/';
@@ -56,61 +58,90 @@ class ApiProfileController extends Controller
                         $upload_success = $request->file("photo")->storeAs($directory, $filename, 'public');
 
                         $user->update([
-                            'name' => $request->name,
-                            'email' => $request->email,
-                            'password' => sha1($request->password),
-                            'address' => $request->address,
-                            'gender' => $request->gender,
-                            //'birthdate'=>$request->birthdate,
-                            'regency_id' => $request->regency_id,
-                            'photo' => $filename,
-                            'status'=>0,
+                            "name"=>$request->name,
+                            "email"=>$request->email,
+                            "address"=>$request->address,
+                            "gender"=>$request->gender,
+                            "regency_id"=>$request->regency_id,
+                            "photo"=>$filename,
+                            "status"=>0,
+                            "token"=>$token
                         ]);
 
-                        return response()->json([
-                            "status" => true,
-                            "code" => 200,
-                            "message" => "berhasil diupdate menggunakan foto",
-                            "data" => $user
-                        ]);
-                    } else {
-                        //$filename = '';
-                        $user->update([
-                            'name' => $request->name,
-                            'email' => $request->email,
-                            //'password'=>sha1($request->password),
-                            'address' => $request->address,
-                            'gender' => $request->gender,
-                            //'birthdate'=>$request->birthdate,
-                            'regency_id' => $request->regency_id,
-                            //'photo' => $filename,
-                            'status'=>0,
-                        ]);
+                        Mail::to($request->email)->send(new RegisterEmail($request->name,$token,$request->email));
 
                         return response()->json([
-                            "status" => true,
-                            "code" => 300,
-                            "message" => "berhasil diupdate tanpa foto",
+                            "status"=>true,
+                            "code"=>200,
+                            "message"=>"berhasil update user menggunakan foto",
+                            "data"=>$user
                         ]);
                     }
-                    //kirim EMAIL disini
+                    else
+                    {
+                        $user->update([
+                            "name"=>$request->name,
+                            "email"=>$request->email,
+                            "address"=>$request->address,
+                            "gender"=>$request->gender,
+                            "regency_id"=>$request->regency_id,
+                            //"photo"=>$filename,
+                            "status"=>0,
+                            "token"=>$token
+                        ]);
+
+                        Mail::to($request->email)->send(new RegisterEmail($request->name,$token,$request->email));
+
+                        return response()->json([
+                            "status"=>false,
+                            "code"=>300,
+                            "message"=>"berhasil update tanpa menggunakan foto"
+                        ]);
+                    }
                 }
-                else {
-                    return response()->json([
-                        "status" => false,
-                        "code" => 500,
-                        "message" => "password tidak sesuai"
-                    ]);
+                else
+                {
+                    if($request->file('photo'))
+                    {
+                        $time = Carbon::now();
+                        $extension = $request->file('photo')->getClientOriginalExtension();
+                        $directory = 'Account/';
+                        $filename = str_slug($request->input('name')) . '-' . date_format($time, 'd') . rand(1, 999) . date_format($time, 'h') . "." . $extension;
+                        $upload_success = $request->file("photo")->storeAs($directory, $filename, 'public');
+
+                        $user->update([
+                            "name"=>$request->name,
+                            "email"=>$request->email,
+                            "address"=>$request->address,
+                            "gender"=>$request->gender,
+                            "regency_id"=>$request->regency_id,
+                            "photo"=>$filename
+                        ]);
+
+                        return response()->json([
+                            "status"=>false,
+                            "code"=>400,
+                            "message"=>"Email yang dimasukkan sama menggunakan foto berhasil diupdate"
+                        ]);
+                    }
+                    else
+                    {
+                        $user->update([
+                            "name"=>$request->name,
+                            "email"=>$request->email,
+                            "address"=>$request->address,
+                            "gender"=>$request->gender,
+                            "regency_id"=>$request->regency_id,
+                            //"photo"=>$filename
+                        ]);
+
+                        return response()->json([
+                            "status"=>false,
+                            "code"=>401,
+                            "message"=>"Email yang dimasukkan sama tanpa menggunakan foto berhasil diupdate"
+                        ]);
+                    }
                 }
-            }
-            else
-            {
-                return response()->json([
-                    "status"=>false,
-                    "code"=>400,
-                    "message"=>"email yang dimasukkan sama"
-                ]);
-            }
         }
     }
 
@@ -190,7 +221,7 @@ class ApiProfileController extends Controller
                 return response()->json([
                    "status"=>false,
                    "code"=>300,
-                   "message"=>"data user berhasul ditampilkan tanpa foto",
+                   "message"=>"data user berhasil ditampilkan tanpa foto",
                     "data"=>$cekuser
                 ]);
             }

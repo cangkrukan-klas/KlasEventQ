@@ -260,7 +260,7 @@
                             <table border="0" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
-                                        <p>Hai, {{ $name }}</p>
+                                        <p>Hai,</p>
                                         <p>Terimakasih telah mendaftar, segera konfirmasikan pendaftaran akun mu di link berikut </p>
 
                                         <table border="0" cellpadding="0" cellspacing="0">

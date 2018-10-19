@@ -26,11 +26,11 @@ class EmailController extends Controller
             $user->save();
             if($user->user_role == 1)
             {
-                return view('Auth.login');
+                return view('FrontEnd.emailverification');
             }
             else
             {
-                redirect('Auth.login');
+                redirect('FrontEnd.emailverification');
             }
         }
         else
@@ -45,9 +45,10 @@ class EmailController extends Controller
         $registerUser = EventParticipant::where('event_id', $event_id)->where('token', $token)->first();
         if ($registerUser)
         {
+            $registerUser->token = 0;
             $registerUser->attendance = 1;
             $registerUser->save();
-            return view('/'); //direturn ke view event dengan tampilan sudah registered
+            return view('FrontEnd.emailverification'); //direturn ke view event dengan tampilan sudah registered
         }
     }
 

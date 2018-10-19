@@ -32,7 +32,7 @@
                             <h3 class="box-title"><b>Tambah data event</b></h3>
                         </div>
                         <div class="box-body">
-                            <form class="form-main form-update" action="{{ url('/event/store') }}" method="POST" enctype="multipart/form-data">
+                            <form class="form-main form-update" action="{{ url('/admin/event/store') }}" method="POST" enctype="multipart/form-data">
                                 {{ csrf_field() }}
 
                                 <div class="form-group">

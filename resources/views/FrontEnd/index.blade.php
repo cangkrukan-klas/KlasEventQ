@@ -35,7 +35,7 @@
 <!--header start here -->
 <header class="header navbar fixed-top navbar-expand-md">
     <div class="container">
-        <a class="navbar-brand logo" href="#">
+        <a class="navbar-brand logo" href="{{url('/login')}}">
             <img src="{{asset('img/logo.png')}}" alt="Evento"/>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#headernav" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,25 +44,26 @@
         <div class="collapse navbar-collapse flex-sm-row-reverse" id="headernav">
             <ul class=" nav navbar-nav menu">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link active" href="{{url('/')}}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#">Speakers</a>
+                    <a class="nav-link " href="{{url('/about')}}">About</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#">Events</a>
+                    <a class="nav-link " href="{{url('/events')}}">Events</a>
+                </li>
+                @if ($loginstatus['status'])
+                <li class="nav-item">
+                    <a class="nav-link " href="{{url('/profile')}}">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#">News</a>
+                    <a class="nav-link " href="{{url('/logout')}}">Logout</a>
                 </li>
+                @else
                 <li class="nav-item">
                     <a class="nav-link " href="{{url('/login')}}">Login</a>
                 </li>
-                <li class="search_btn">
-                    <a  href="#">
-                        <i class="ion-ios-search"></i>
-                    </a>
-                </li>
+                @endif
             </ul>
         </div>
     </div>
@@ -72,27 +73,29 @@
 <!--cover section slider -->
 <section id="home" class="home-cover">
     <div class="cover_slider owl-carousel owl-theme">
+        @foreach($triEvent as $u)
         <div class="cover_item" style="background: url({{URL::asset('img/bg/slider.png')}});">
             <div class="slider_content">
                 <div class="slider-content-inner">
                     <div class="container">
                         <div class="slider-content-center">
                             <h2 class="cover-title">
-                                Kelompok Linux Arek
+                                {{$u->name}}
                             </h2>
                             <strong class="cover-xl-text">Suroboyo</strong>
                             <p class="cover-date">
-                                12-14 February 2018  - Los Angeles, CA.
+                                {{ $u->start_date }} - {{ $u->end_date }}
                             </p>
-                            <a href="#" class=" btn btn-primary btn-rounded" >
-                                Buy Tickets Now
+                            <a href="{{ url('/events') }}/{{ $u->id }}" class=" btn btn-primary btn-rounded" >
+                                Read More
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="cover_item" style="background: url({{URL::asset('img/bg/slider.png')}});">
+        @endforeach
+        <!--<div class="cover_item" style="background: url({{URL::asset('img/bg/slider.png')}});">
             <div class="slider_content">
                 <div class="slider-content-inner">
                     <div class="container">
@@ -131,7 +134,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
     <div class="cover_nav">
         <ul class="cover_dots">
@@ -143,7 +146,7 @@
 </section>
 <!--cover section slider end -->
 
-<!--event info -->
+<!--event info
 <section class="pt100 pb100">
     <div class="container">
         <div class="row justify-content-center">
@@ -209,7 +212,7 @@
 <!--event info end -->
 
 
-<!--event countdown -->
+<!--event countdown
 <section class="bg-img pt70 pb70" style="background-image: url{{asset('img/bg/bg-img.png')}};">
     <div class="overlay_dark"></div>
     <div class="container">
@@ -224,7 +227,7 @@
 <!--event count down end-->
 
 
-<!--about the event -->
+<!--about the event
 <section class="pt100 pb100">
     <div class="container">
         <div class="section_title">
@@ -245,7 +248,7 @@
             </div>
         </div>
 
-        <!--event features-->
+        <!--event features
         <div class="row justify-content-center mt30">
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="icon_box_one">
@@ -299,10 +302,54 @@
                 </div>
             </div>
         </div>
-        <!--event features end-->
+        <!--event features end
     </div>
 </section>
 <!--about the event end -->
+
+<!--event calender-->
+<section class="pt100 pb100">
+    <div class="container">
+        <div class="table-responsive">
+            <table class="event_calender table">
+                <thead class="event_title">
+                <tr>
+                    <th>
+                        <i class="ion-ios-calendar-outline"></i>
+                        <span>next events calendar</span>
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+@foreach ($event as $ev)
+                <tr>
+                    <td>
+                        <img src="{{asset('img/cleander/c1.png')}}" alt="event">
+                    </td>
+                    <td class="event_date">
+                        {{ $ev->quota }}
+                        <span>kuota tersisa</span>
+                    </td>
+                    <td>
+                        <div class="event_place">
+                            <h5>{{ $ev->name }}</h5>
+                            <h6>{{ $ev->start_date }} - {{ $ev->end_date }}</h6>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{{ url('/events') }}/{{ $ev->id }}" class="btn btn-primary btn-rounded">Read More</a>
+                    </td>
+                </tr>
+@endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<!--event calender end -->
 
 
 <!--speaker section-->
@@ -310,105 +357,29 @@
     <div class="container">
         <div class="section_title mb50">
             <h3 class="title">
-                our speakers
+                Member Cangkrukan
             </h3>
         </div>
     </div>
     <div class="row justify-content-center no-gutters">
+        @foreach($user as $u)
         <div class="col-md-3 col-sm-6">
             <div class="speaker_box">
                 <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s1.png')}}" alt="speaker name">
+                    <img src="{{url('Images/Account')}}/<?php if ($u->photo == ''){ echo 'imanuel-nathanael-1459809.png';} else { echo $u->photo; }?>" alt="speaker name">
                     <div class="info_box">
-                        <h5 class="name">Patricia Stone</h5>
-                        <p class="position">CEO Company</p>
+                        <h5 class="name">{{$u->name}}</h5>
+                        <p class="position">{{$u->regency_id}}</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s2.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">James Oliver</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s3.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">Carla Banks</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s4.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">William Smith</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s5.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">Jessica Black</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s6.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">Patricia Stone</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s7.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">Duncan Stan</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="speaker_box">
-                <div class="speaker_img">
-                    <img src="{{asset('img/speakers/s8.png')}}" alt="speaker name">
-                    <div class="info_box">
-                        <h5 class="name">Patricia Stone</h5>
-                        <p class="position">CEO Company</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
 </section>
 <!--speaker section end -->
 
-<!--Price section-->
+<!--Price section
 <section class="pb100">
     <div class="container">
         <div class="section_title mb50">
@@ -528,98 +499,9 @@
 </section>
 <!--price section end -->
 
-<!--event calender-->
-<section class="pb100">
-    <div class="container">
-        <div class="table-responsive">
-            <table class="event_calender table">
-                <thead class="event_title">
-                <tr>
-                    <th>
-                        <i class="ion-ios-calendar-outline"></i>
-                        <span>next events calendar</span>
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <img src="{{asset('img/cleander/c1.png')}}" alt="event">
-                    </td>
-                    <td class="event_date">
-                        14
-                        <span>February</span>
-                    </td>
-                    <td>
-                        <div class="event_place">
-                            <h5>Conference in Amsterdam</h5>
-                            <h6>08 AM - 04 PM</h6>
-                            <p>Speaker: Daniel Hill</p>
-                        </div>
-                    </td>
-                    <td>
-                        <a href="#" class="btn btn-primary btn-rounded">Read More</a>
-                    </td>
-                    <td class="buy_link">
-                        <a href="#">buy now</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="{{asset('img/cleander/c2.png')}}" alt="event">
-                    </td>
-                    <td class="event_date">
-                        18
-                        <span>February</span>
-                    </td>
-                    <td>
-                        <div class="event_place">
-                            <h5>Conference in Amsterdam</h5>
-                            <h6>08 AM - 04 PM</h6>
-                            <p>Speaker: Daniel Hill</p>
-                        </div>
-                    </td>
-                    <td>
-                        <a href="#" class="btn btn-primary btn-rounded">Read More</a>
-                    </td>
-                    <td class="buy_link">
-                        <a href="#">buy now</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="{{asset('img/cleander/c3.png')}}" alt="event">
-                    </td>
-                    <td class="event_date">
-                        22
-                        <span>February</span>
-                    </td>
-                    <td>
-                        <div class="event_place">
-                            <h5>Conference in Amsterdam</h5>
-                            <h6>08 AM - 04 PM</h6>
-                            <p>Speaker: Daniel Hill</p>
-                        </div>
-                    </td>
-                    <td>
-                        <a href="#" class="btn btn-primary btn-rounded">Read More</a>
-                    </td>
-                    <td class="buy_link">
-                        <a href="#">buy now</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-<!--event calender end -->
 
-<!--brands section -->
+
+<!--brands section
 <section class="bg-gray pt100 pb100">
     <div class="container">
         <div class="section_title mb50">
@@ -650,19 +532,19 @@
 <!--brands section end-->
 
 <!--get tickets section -->
-<section class="bg-img pt100 pb100" style="background-image: url({{URL::asset('img/bg/tickets.png')}});">
+<section class="bg-img pt100 pb100 overlay" style="background-image: url({{URL::asset('img/bg/cangkrukan.jpeg')}});">
     <div class="container">
         <div class="section_title mb30">
             <h3 class="title color-light">
-                GEt your tikets
+                Event
             </h3>
         </div>
         <div class="row justify-content-center align-items-center">
             <div class="col-md-9 text-md-left text-center color-light">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. In rhoncus massa nec gravida tempus. Integer iaculis in aazzzCurabitur a pulvinar nunc. Maecenas laoreet finibus lectus, at volutpat ligula euismod.
+                KLAS mengadakan event per bulannya. Apakah Anda tertarik mengikuti event yang akan dilaksanakan? Untuk informasi lengkapnya, Anda bisa lihat selengkapnya di halaman di bawah ini.
             </div>
             <div class="col-md-3 text-md-right text-center">
-                <a href="#" class="btn btn-primary btn-rounded mt30">buy now</a>
+                <a href="{{ url('/events') }}" class="btn btn-primary btn-rounded mt30">Lihat Event</a>
             </div>
         </div>
     </div>
@@ -683,23 +565,17 @@
                     </div>
                     <div class="footer_box_body">
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In rhoncus massa nec gravida tempus. Integer iaculis in aazzzCurabitur a pulvinar nunc. Maecenas laoreet finibus lectus, at volutpat ligula euismod.
+                            Kelompok Linux Arek Suroboyo atau biasa di sebut KLAS adalah sebuah perkumpulan pengguna linux dari berbagai macam distro yang bermukim di kawasan kota Surabaya. Terdiri dari pegawai IT, mahasiswa.
                         </p>
                         <ul class="footer_social">
                             <li>
-                                <a href="#"><i class="ion-social-pinterest"></i></a>
+                                <a href="mailto:aris@klas.or.id"><i class="ion-email"></i></a>
                             </li>
                             <li>
-                                <a href="#"><i class="ion-social-facebook"></i></a>
+                                <a href="https://www.facebook.com/groups/KLAS.Activity/"><i class="ion-social-facebook"></i></a>
                             </li>
                             <li>
-                                <a href="#"><i class="ion-social-twitter"></i></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="ion-social-dribbble"></i></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="ion-social-instagram"></i></a>
+                                <a href="https://twitter.com/KLAS_Activity"><i class="ion-social-twitter"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -708,61 +584,13 @@
 
             <div class="col-12 col-md-4">
                 <div class="footer_box">
-                    <div class="footer_header">
-                        <h4 class="footer_title">
-                            instagram
-                        </h4>
-                    </div>
-                    <div class="footer_box_body">
-                        <ul class="instagram_list">
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c1.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c2.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c3.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c3.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c2.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <img src="{{asset('img/cleander/c1.png')}}" alt="instagram">
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    
                 </div>
             </div>
 
             <div class="col-12 col-md-4">
                 <div class="footer_box">
-                    <div class="footer_header">
-                        <h4 class="footer_title">
-                            subscribe to our newsletter
-                        </h4>
-                    </div>
-                    <div class="footer_box_body">
-                        <div class="newsletter_form">
-                            <input type="email" class="form-control" placeholder="E-Mail here">
-                            <button class="btn btn-rounded btn-block btn-primary">SUBSCRIBE</button>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -773,25 +601,19 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-12">
                 <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved <!--| This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>-->
                     <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
             </div>
             <div class="col-12 col-md-6 ">
                 <ul class="footer_menu">
                     <li>
-                        <a href="#">Home</a>
+                        <a href="{{ url('/') }}">Home</a>
                     </li>
                     <li>
-                        <a href="#">Speakers</a>
+                        <a href="{{ url('/about') }}">About</a>
                     </li>
                     <li>
-                        <a href="#">Events</a>
-                    </li>
-                    <li>
-                        <a href="#">News</a>
-                    </li>
-                    <li>
-                        <a href="#">Contact</a>
+                        <a href="{{ url('/events') }}">Events</a>
                     </li>
                 </ul>
             </div>

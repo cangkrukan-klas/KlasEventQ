@@ -50,6 +50,7 @@ class LoginController extends Controller
                 } else
                     {
                     $request->session()->put('activeUser', $activeUser);
+                    //dd(session('activeUser'));
                     return redirect("/admin/profile")->with('alert','Anda sudah logout');
                 }
             }
@@ -64,6 +65,13 @@ class LoginController extends Controller
     {
         $request->session()->flush();
         return redirect('/');
+    }
+    
+    public function CheckSession(Request $request)
+    {
+        if($request->session()->get('activeUser')){
+            return "ada session";
+        }
     }
 
 }

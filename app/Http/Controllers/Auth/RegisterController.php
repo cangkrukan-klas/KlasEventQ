@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Mail\RegisterEmail;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class RegisterController extends Controller
             ]);
 
             if (User::create($user)) {
-                try {
+                /*try {
                     Mail::send('email', ['token' => $token, 'name' => $request->name, 'email' => $request->email], function ($message) use ($request) {
                         $message->subject('Konfirmasi Pendaftaran User Baru');
                         $message->from('cangkrukanklas18@gmail.com', 'Kelompok Linux Arek Suroboyo (KLAS)');
@@ -61,7 +62,9 @@ class RegisterController extends Controller
                 } catch (Exception $e) {
                     return response(['status' => false, 'errors' => $e->getMessage()]);
                     return view('Auth.login');
-                }
+                }*/
+
+                Mail::to($request->email)->send(new RegisterEmail($request->name, $token, $request->email));
             }
         }
         else

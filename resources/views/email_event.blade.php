@@ -273,7 +273,7 @@
                                                             <td> <div class="container">
                                                                     <center><p>Klik pada link berikut :</p></center>
                                                                     <hr>
-                                                                    <center><p><a href="{{ url('/event_confirmation/'.$event_id.'/'.$token)}}">Link Konfirmasi</a></p></center>
+                                                                    <center><p><a href="{{ url('/event_confirm/'.$event_id.'/'.$token)}}">Link Konfirmasi</a></p></center>
                                                                     <hr>
                                                                     <center><p>Telah Disampaikan! <br> Terimakasih telah menghubungi kami!</p></center>
                                                                 </div>

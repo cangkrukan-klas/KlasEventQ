@@ -13,6 +13,17 @@ class ProfileController extends Controller
 {
     public function index()
     {
+        //dd(session('activeUser'));
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
         return view('BackEnd.profile');
     }
 

@@ -8,12 +8,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Mail\EventConfirmEmail;
 use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class ApiEventParticipantController extends Controller
@@ -52,30 +54,23 @@ class ApiEventParticipantController extends Controller
                         
                         if(EventParticipant::create($eventparticipant))
                         {
-                        try {
-                        Mail::send('email_event', ['token' => $token, 'event_id'=>$request->event_id], function ($message) use ($request) {
-                            $activeUser = User::where('id',$request->user_id)->first();
-                            $message->subject('Konfirmasi Pendaftaran Peserta Event');
-                            $message->from('cangkrukanklas18@gmail.com', 'Kelompok Linux Arek Suroboyo (KLAS)');
-                            $message->to($activeUser->email);
-                        });
 //                        return back()->with('alert-success', 'Berhasil Kirim Email');
+
+                            Mail::to($activeUser->email)->send(new EventConfirmEmail($event,$token));
                             return response()->json([
                                 "status"=>true,
                                 "code"=>200,
-                                "message"=>"berhasil mendaftar"
+                                "message"=>"berhasil mendaftar",
+                                "data"=>$eventparticipant
                             ]);
-                    } catch (Exception $e) {
-                        return response(['status' => false, 'code'=>200, 'errors' => $e->getMessage()])->json(['code'=>200]);
-                        //return view('Auth.login');
-                    }
                         }
                         else
                         {
                             return response()->json([
                                 "status"=>false,
                                 "code"=>204,
-                                "message"=>"gagal mendaftar pada event ini"
+                                "message"=>"gagal mendaftar pada event ini",
+                                "data"=>null
                             ]);
                         }
                     }
@@ -84,7 +79,8 @@ class ApiEventParticipantController extends Controller
                         return response()->json([
                             "status"=>false,
                             "code"=>203,
-                            "message"=>"Anda sudah terdaftar pada user ini"
+                            "message"=>"Anda sudah terdaftar pada user ini",
+                            "data"=>null
                         ]);
                     }
 
@@ -154,16 +150,23 @@ class ApiEventParticipantController extends Controller
         ]);
     }
 
+
     public function showById($id)
     {
-        $registeredEvent = EventParticipant::findOrFail($id);
-        if($registeredEvent)
+        //$event_id = EventParticipant::where('user_id',$id)->select('event_id')->get();
+        $event_name = DB::table('event_participant')
+            ->join('event', 'event_participant.event_id','=','event.id')
+            ->select('event.*')
+            ->where('event_participant.user_id','=',$id)
+            ->orderBy('date_created','ASC')
+            ->get();
+        if($event_name)
         {
             return response()->json([
                 "status" => true,
                 "code"=>200,
                 "message"=>"data berhasil ditampilkan",
-                "data" => "$registeredEvent"
+                "data" => $event_name
             ]);
         }
         else

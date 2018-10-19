@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventParticipant;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use DB;
@@ -23,16 +24,49 @@ class EventController extends Controller
 {
     public function index()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         return view('BackEnd.Database.Event.event');
     }
 
     public function getDataTable()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         return DataTables::of(Event::all())->make(true);
     }
 
     public function getDetail(Request $request)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $data = [
             'event' => DB::table('q_event')->where('id', $request->id)->first()
         ];
@@ -41,6 +75,17 @@ class EventController extends Controller
 
     public function create()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $data = [
             'category' => DB::table('category')->get(),
             'regency' => DB::table('regencies')->get(),
@@ -52,6 +97,17 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if($request->file("photo"))
         {
             $time = Carbon::now();
@@ -107,6 +163,17 @@ class EventController extends Controller
 
     public function edit($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $data=[
             'event' => Event::find($id),
             'category' => DB::table('category')->get(),
@@ -117,6 +184,17 @@ class EventController extends Controller
 
     public function update(Request $request, $id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if($request->file("photo"))
         {
             $time = Carbon::now();
@@ -167,6 +245,17 @@ class EventController extends Controller
 
     public function delete($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if(Event::destroy($id))
         {
             return view("BackEnd.Database.Event.event");
@@ -176,20 +265,42 @@ class EventController extends Controller
 
     public function getDataTableList($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $list = DB::table('event_participant')
             ->join('user','user.id','=','event_participant.user_id')
             ->select('user.name','user.email')
             ->where('event_id',$id)
             ->get();
 
-        return DataTables::eloquent($list)->make(true);
-        //dd($list);
+        //return DataTables::eloquent($list)->make(true);
+        dd($list);
 
         //return DataTables::of($list)->make(true);
     }
 
     public function list_peserta($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $event = Event::where('id',$id)->first();
 
         return view('BackEnd.Database.Event.list_peserta',$event);
@@ -201,5 +312,12 @@ class EventController extends Controller
             //echo "email ini ($list->email) adalah milik $list->name";
             //echo "<br/>";
         //}
+    }
+
+    public function hehe() {
+        $triEvent = Event::limit(3)->get();
+        $event = Event::get();
+        $user = User::get();
+        return view('hehe',compact('triEvent','event','user'));
     }
 }

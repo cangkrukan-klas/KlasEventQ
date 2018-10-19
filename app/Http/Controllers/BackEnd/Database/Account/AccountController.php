@@ -22,16 +22,49 @@ class AccountController extends Controller
 {
     public function index()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         return view('BackEnd.Database.Account.account');
     }
 
     public function getDataTable()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         return DataTables::of(User::all())->make(true);
     }
 
     public function create()
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $data = [
             'regency'=> DB::table('regencies')->get(),
             //'provinces'=>DB::table('provinces')->get()
@@ -42,6 +75,17 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if($request->file("photo"))
         {
             $time = Carbon::now();
@@ -95,6 +139,17 @@ class AccountController extends Controller
 
     public function edit($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         $data = [
             'user' => User::find($id),
             'regencies'=> DB::table('regencies')->get(),
@@ -104,6 +159,17 @@ class AccountController extends Controller
 
     public function update(Request $request, $id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if($request->file("photo"))
         {
             $time = Carbon::now();
@@ -149,6 +215,17 @@ class AccountController extends Controller
 
     public function delete($id)
     {
+        if(session('activeUser') == null) {
+            //return redirect()->back();
+            return redirect('/');
+        }
+
+        if(session('activeUser')->user_role == 1) {
+            //return redirect('/admin/profile');
+        } else {
+            return redirect('/login');
+        }
+
         if(User::destroy($id))
         {
             return view('BackEnd.Database.Account.account');

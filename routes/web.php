@@ -10,16 +10,47 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-//Routing dasar untuk tampilan awal web - FrontEnd
+//Routing dasar untuk tampilan awal web - FrontEndl
 Route::group(['prefix'=>'/'],function()
 {
     //-----------------FRONTEND------------------------------//
     //Routing ke arah halaman frontend User
-    Route::get('/',function ()
-    {
-        return view('FrontEnd.index');
-    });
+    Route::get('/',
+        [
+            "uses"=>"FrontEnd\WebController@WebIndex",
+            "as"=>"frontpage"
+        ]);
 
+    Route::get('/session',
+        [
+            "uses"=>"Auth\LoginController@CheckSession",
+            "as"=>"sessionpage"
+        ]);
+        
+    Route::get('/about',
+        [
+            "uses"=>"FrontEnd\WebController@AboutIndex",
+            "as"=>"aboutpage"
+        ]);
+        
+    Route::get('/events',
+        [
+            "uses"=>"FrontEnd\WebController@EventIndex",
+            "as"=>"eventpage"
+        ]);
+        
+    Route::get('/events/{id}',
+        [
+            "uses"=>"FrontEnd\WebController@EventSingleIndex",
+            "as"=>"eventsinglepage"
+        ]);
+    
+    Route::post('/events/{id}',
+        [
+            "uses"=>"FrontEnd\WebController@JoinEvent",
+            "as"=>"joineventpage"
+        ]);
+    
     Route::get('/login',
         [
             "uses"=>"Auth\LoginController@FrontEndIndex",
@@ -60,6 +91,10 @@ Route::group(['prefix'=>'/'],function()
             "uses"=>"EmailController@event_confirm",
             "as"=>"eventregis"
         ]);
+
+    Route::get('/hehe',[
+        "uses"=>"BackEnd\Database\Event\EventController@hehe",
+    ]);
 
 
     //-----------------BACKEND------------------------------//
@@ -111,6 +146,12 @@ Route::group(['prefix'=>'/'],function()
         Route::post('/logout',
             [
                 "uses"=>'Auth\LoginController@logoutuser',
+                "as"=>"logout"
+            ]);
+            
+        Route::get('/logout',
+            [
+                "uses"=>'FrontEnd\WebController@LogoutUser',
                 "as"=>"logout"
             ]);
 
